@@ -105,6 +105,59 @@ The full form is used when the config has a `properties` key holding an object. 
 'org.gradle.caching': process.env.CI ? true : null,
 ```
 
+## Setting the Android ABIs
+
+`reactNativeArchitectures` is the property people most often come here for, so it's worth spelling out. It takes a **comma-separated string**, not an array:
+
+```ts
+plugins: [
+  ['expo-gradle-properties', {
+    reactNativeArchitectures: 'arm64-v8a',
+  }],
+]
+```
+
+Android has four ABIs (CPU architectures):
+
+| ABI | What it is | Do you need it? |
+| --- | --- | --- |
+| `arm64-v8a` | 64-bit ARM | **Yes.** Every modern phone, and required by Google Play. |
+| `armeabi-v7a` | 32-bit ARM | Only for older devices. Still supported — *not* deprecated. |
+| `x86_64` | 64-bit Intel | Only for emulators (Apple Silicon and Intel). |
+| `x86` | 32-bit Intel | Effectively legacy. Physical x86 Android devices are long gone. |
+
+**The Expo template builds all four.** That default is safe but expensive: every native dependency you have — Reanimated, Gesture Handler, Nitro, MapLibre, SVG, Screens — gets its C++ compiled **four separate times**. On a large app that dominates build time.
+
+Narrowing to one architecture is the single biggest build-time win available:
+
+```ts
+reactNativeArchitectures: 'arm64-v8a'   // every modern phone
+```
+
+The tradeoff is real: that build **will not install** on 32-bit ARM devices or on x86 emulators. It's ideal for local development and CI on Apple Silicon, and for testing on modern hardware.
+
+To go back to the full set:
+
+```ts
+reactNativeArchitectures: 'armeabi-v7a,arm64-v8a,x86,x86_64'
+```
+
+### A note on app size
+
+Narrowing ABIs does **not** shrink what your users download, if you ship an **App Bundle** (`.aab`) — which Google Play requires. Play splits the bundle per device and delivers only the matching ABI, so a user on an arm64 phone downloads arm64 code either way.
+
+What narrowing *does* shrink is a **universal APK** — a dev-client build, an internal-distribution APK, or anything installed via `adb`. And what it always saves is **build time**.
+
+### What Google Play requires
+
+Since **August 2019**, Play has required a 64-bit version of any app containing native code — you cannot publish 32-bit only. `armeabi-v7a` is *not* deprecated and 32-bit devices still exist, so the usual production answer is to ship both ARM ABIs and drop the x86 pair:
+
+```ts
+reactNativeArchitectures: 'armeabi-v7a,arm64-v8a'
+```
+
+From Android 14, devices with ARMv9 cores cannot run 32-bit code at all, so the long-term direction is arm64-only — but that's not the situation today.
+
 ## Behaviour
 
 **Existing keys are replaced in place.** The entry keeps its original position, so a prebuild diff is one changed line rather than a deletion plus an append at the bottom — and the template's explanatory comment stays attached to the property it explains.
@@ -149,7 +202,8 @@ Expo writes `gradle.properties` as `key=value` with **no escaping at all**, so a
 - keys starting with `#` or `!` — the line would be a comment
 - values containing a line break
 - values ending in an odd number of backslashes — a trailing `\` is a line continuation and would swallow the next property
-- non-finite numbers, arrays, objects
+- non-finite numbers and objects
+- arrays — with a message showing the joined string to write instead, since `expo-build-properties` takes its ABI list as an array and the habit carries over
 - unknown options in the full form — because silently dropping an option is the bug this package exists to fix
 
 ## Should you use this or `expo-build-properties`?

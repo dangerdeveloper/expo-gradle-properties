@@ -54,7 +54,7 @@ describe('normalizeOptions — full form', () => {
 	})
 
 	it('treats an array "properties" as shorthand, not as the full form', () => {
-		expect(() => normalize({ properties: ['a'] })).toThrow(/expected a string, number, boolean or null/)
+		expect(() => normalize({ properties: ['a'] })).toThrow(/arrays are not supported/)
 	})
 
 	it('throws on an unknown option instead of silently dropping it', () => {
@@ -100,11 +100,51 @@ describe('normalizeOptions — value coercion', () => {
 		expect(() => normalize({ key: input })).toThrow(/is not a finite number/)
 	})
 
+	it('rejects an object', () => {
+		expect(() => normalize({ key: { a: 1 } })).toThrow(/expected a string, number, boolean or null/)
+	})
+})
+
+describe('normalizeOptions — arrays get a targeted message', () => {
+	// Anyone arriving from `expo-build-properties` (`buildArchs: ['arm64-v8a']`) will
+	// reach for an array here, so the error has to point at the fix, not just refuse.
+	it('rejects an array and shows the joined string to write instead', () => {
+		expect(() => normalize({ reactNativeArchitectures: ['arm64-v8a', 'x86_64'] })).toThrow(
+			/arrays are not supported/
+		)
+		expect(() => normalize({ reactNativeArchitectures: ['arm64-v8a', 'x86_64'] })).toThrow(
+			/'arm64-v8a,x86_64'/
+		)
+	})
+
+	it('explains why it will not join the array itself', () => {
+		expect(() => normalize({ key: ['a', 'b'] })).toThrow(/different properties separate their items differently/)
+	})
+
 	it.each([
-		['an array', ['a']],
-		['an object', { a: 1 }]
-	])('rejects %s', (_label, input) => {
-		expect(() => normalize({ key: input })).toThrow(GradlePropertiesConfigError)
+		['numbers', [1, 2]],
+		['booleans', [true, false]]
+	])('suggests a joined string for an array of %s', (_label, input) => {
+		expect(() => normalize({ key: input })).toThrow(/Join it yourself/)
+	})
+
+	// Suggesting only a comma would be wrong for space-separated properties.
+	it('shows both the comma and the space form', () => {
+		expect(() => normalize({ key: ['a', 'b'] })).toThrow(/'a,b'/)
+		expect(() => normalize({ key: ['a', 'b'] })).toThrow(/'a b'/)
+	})
+
+	it('omits the suggestion when the items cannot be joined sensibly', () => {
+		expect(() => normalize({ key: [{ a: 1 }] })).toThrow(/arrays are not supported/)
+		expect(() => normalize({ key: [{ a: 1 }] })).not.toThrow(/Join it yourself/)
+	})
+
+	it('handles an empty array', () => {
+		expect(() => normalize({ key: [] })).toThrow(/arrays are not supported/)
+	})
+
+	it('still reports the full-form array case as a value error', () => {
+		expect(() => normalize({ properties: ['a'] })).toThrow(/arrays are not supported/)
 	})
 })
 

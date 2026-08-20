@@ -105,9 +105,35 @@ function coerceValue(key: string, value: unknown): string | null {
 		return String(value)
 	}
 
+	// Arrays get their own message. `expo-build-properties` takes its ABI list as an
+	// array (`buildArchs: ['arm64-v8a']`), so anyone arriving from there reaches for
+	// one here too. Joining it automatically would be wrong — Gradle properties use
+	// different separators (commas for reactNativeArchitectures, spaces for jvmargs) —
+	// so the plugin refuses, and shows the exact string to write instead.
+	if (Array.isArray(value)) {
+		const joinable = value.every(
+			item => typeof item === 'string' || typeof item === 'number' || typeof item === 'boolean'
+		)
+		// Deliberately shows BOTH separators. Suggesting only a comma would be wrong for
+		// the space-separated properties (org.gradle.jvmargs), and picking per-key would
+		// mean maintaining a list of every Gradle property in existence.
+		const suggestion = joinable
+			? ` Join it yourself, using whatever separator the property expects — e.g. '${value.join(',')}'` +
+				` for a comma-separated property such as reactNativeArchitectures, or '${value.join(' ')}'` +
+				' for a space-separated one such as org.gradle.jvmargs.'
+			: ''
+
+		throw new GradlePropertiesConfigError(
+			`Invalid value for ${JSON.stringify(key)}: arrays are not supported. A gradle.properties ` +
+				'value is a plain string, and different properties separate their items differently ' +
+				'(commas, spaces, semicolons), so this plugin will not guess.' +
+				suggestion
+		)
+	}
+
 	throw new GradlePropertiesConfigError(
 		`Invalid value for ${JSON.stringify(key)}: expected a string, number, boolean or null, ` +
-			`but got ${Array.isArray(value) ? 'an array' : typeof value}.`
+			`but got ${typeof value}.`
 	)
 }
 
