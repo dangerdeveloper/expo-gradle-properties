@@ -1,6 +1,6 @@
 {
 	"name": "expo-gradle-properties",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"description": "Expo config plugin to set arbitrary keys in android/gradle.properties — the generic escape hatch expo-build-properties doesn't have.",
 	"main": "build/index.js",
 	"types": "build/index.d.ts",
