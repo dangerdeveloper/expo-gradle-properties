@@ -19,6 +19,8 @@ plugins: [
 ]
 ```
 
+**Contents** — [Why](#why) · [Install](#install) · [Usage](#usage) · [What you can set](#what-you-can-set) · [Android ABIs](#setting-the-android-abis) · [Behaviour](#behaviour) · [Override warning](#the-machine-level-override-warning) · [Validation](#validation) · [vs expo-build-properties](#should-you-use-this-or-expo-build-properties)
+
 ## Why
 
 In a prebuild (CNG) Expo app, `android/` is a build artifact. Editing `android/gradle.properties` by hand works exactly until the next `expo prebuild` throws it away, so the only durable way to set those values is a config plugin.
@@ -82,6 +84,25 @@ plugins: [
 
 The full form is used when the config has a `properties` key holding an object. (A Gradle property genuinely named `properties` therefore needs the full form: `{ properties: { properties: '…' } }`.)
 
+### Listing it more than once
+
+The plugin is not run-once, so you can list it several times to group unrelated settings. Every entry applies.
+
+**Set any given key in one entry only.** If two entries set the same key, the winner is decided by Expo's mod ordering rather than by the plugin — and that ordering is the reverse of what you would expect, so the *earlier* entry wins. Don't build on that; keep each key in one place.
+
+```ts
+plugins: [
+  // memory, with a reason attached
+  ['expo-gradle-properties', { 'org.gradle.jvmargs': '-Xmx4g' }],
+
+  // ...and CI-only caching, kept separate
+  ['expo-gradle-properties', {
+    properties: { 'org.gradle.caching': process.env.CI ? true : null },
+    comment: 'CI overrides',
+  }],
+]
+```
+
 ### Options
 
 | Option | Default | Meaning |
@@ -104,6 +125,27 @@ The full form is used when the config has a `properties` key holding an object. 
 ```ts
 'org.gradle.caching': process.env.CI ? true : null,
 ```
+
+## What you can set
+
+**Any key at all.** The plugin has no list of supported properties — it writes whatever you give it, which is the whole point. These are simply the ones people reach for most often.
+
+| Category | Properties |
+| --- | --- |
+| **Build speed** | `org.gradle.caching` · `org.gradle.parallel` · `org.gradle.configureondemand` · `org.gradle.workers.max` · `org.gradle.daemon` |
+| **Memory** | `org.gradle.jvmargs` · `kotlin.daemon.jvmargs` |
+| **Architectures** | `reactNativeArchitectures` — [see below](#setting-the-android-abis) |
+| **React Native / Expo** | `newArchEnabled` · `hermesEnabled` · `expo.useLegacyPackaging` · `expo.gif.enabled` · `expo.webp.enabled` · `expo.webp.animated` |
+| **AndroidX** | `android.useAndroidX` · `android.enableJetifier` · `android.nonTransitiveRClass` |
+| **Your own** | any flag your `build.gradle` reads via `project.findProperty('myFlag')` |
+
+Three things worth knowing before you reach for these.
+
+**The Expo template already sets several of them** — `newArchEnabled`, `hermesEnabled`, `reactNativeArchitectures` and the `expo.*` image flags all ship in the generated file. Setting one here overwrites it *in place*, keeping the template's explanatory comment attached. Setting it to `null` deletes the line entirely and lets Gradle fall back to its own default.
+
+**One of them has a first-party equivalent.** `reactNativeArchitectures` is also reachable as `buildArchs` in `expo-build-properties`. Either works — just don't set it in both places, or you'll spend an afternoon working out which one won.
+
+**Don't put secrets here.** Signing passwords and API keys are a traditional `gradle.properties` habit, but anything you pass to this plugin lives in your `app.config.ts`, which is committed to git. Use EAS secrets or environment variables and read them in `build.gradle` instead.
 
 ## Setting the Android ABIs
 

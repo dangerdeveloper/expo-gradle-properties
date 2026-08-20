@@ -193,6 +193,33 @@ describe('the plugin as Expo runs it', () => {
 		expect(output).toContain('b=2')
 	})
 
+	it('resolves a key set twice to the EARLIER entry, not the later one', async () => {
+		// Counter-intuitive, and worth pinning down: Expo runs mods in reverse
+		// registration order, so the first `expo-gradle-properties` entry in the
+		// plugins array is the one that runs last and therefore wins. The README tells
+		// people not to rely on this and to set a key in one place only.
+		const base = baseConfig()
+		const first = withGradleProperties(base, { 'org.gradle.jvmargs': '-Xmx2g' })
+		const second = withGradleProperties(first, { 'org.gradle.jvmargs': '-Xmx8g' })
+		const mod = (second as unknown as {
+			mods: { android: { gradleProperties: (c: unknown) => Promise<{ modResults: AndroidConfig.Properties.PropertiesItem[] }> } }
+		}).mods.android.gradleProperties
+
+		const result = await mod({
+			...second,
+			modResults: parsePropertiesFile('existing=0\n'),
+			modRequest: { projectRoot: '/tmp/project', platform: 'android', modName: 'gradleProperties' },
+			modRawConfig: base
+		})
+
+		const output = propertiesListToString(result.modResults)
+		expect(output).toContain('org.gradle.jvmargs=-Xmx2g')
+		expect(output).not.toContain('-Xmx8g')
+
+		const keys = parsePropertiesFile(output).flatMap(i => (i.type === 'property' ? [i.key] : []))
+		expect(keys).toEqual([...new Set(keys)])
+	})
+
 	it('warns when the machine-level Gradle config overrides a key', async () => {
 		const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
 		process.env.GRADLE_USER_HOME = `${__dirname}/__fixtures__/gradle-user-home`

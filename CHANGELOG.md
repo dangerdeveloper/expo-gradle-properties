@@ -19,6 +19,13 @@ All notable changes to this project are documented here. The format follows
 
 ### Documentation
 
+- Added a "What you can set" reference: the properties people actually reach for,
+  grouped by purpose, plus notes on which ones the Expo template already sets, which
+  one overlaps with `expo-build-properties`, and why credentials do not belong here.
+- Documented listing the plugin more than once, including that a key set in two
+  entries resolves to the *earlier* one (Expo runs mods in reverse registration
+  order) — so each key should be set in one place. Pinned down by a test.
+- Added a table of contents.
 - Added a section on setting the Android ABIs: what the four are, why the template's
   all-four default costs build time, and the App Bundle caveat — narrowing ABIs does
   not shrink what users download from Google Play, only universal APKs and build time.
