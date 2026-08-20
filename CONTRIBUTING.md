@@ -6,7 +6,7 @@ genuinely welcome — you do not need to bring a full solution.
 ## Getting set up
 
 ```sh
-git clone https://github.com/ajaysingh56656/expo-gradle-properties.git
+git clone https://github.com/dangerdeveloper/expo-gradle-properties.git
 cd expo-gradle-properties
 bun install
 

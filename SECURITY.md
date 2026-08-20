@@ -9,7 +9,7 @@ please stay current.
 
 Please **do not open a public issue** for a security problem.
 
-Use GitHub's [private vulnerability reporting](https://github.com/ajaysingh56656/expo-gradle-properties/security/advisories/new),
+Use GitHub's [private vulnerability reporting](https://github.com/dangerdeveloper/expo-gradle-properties/security/advisories/new),
 or email **ajaysingh56656@gmail.com**. You can expect an acknowledgement within a few
 days.
 

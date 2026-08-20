@@ -1,7 +1,7 @@
 # expo-gradle-properties
 
 [![npm version](https://img.shields.io/npm/v/expo-gradle-properties.svg)](https://www.npmjs.com/package/expo-gradle-properties)
-[![CI](https://github.com/ajaysingh56656/expo-gradle-properties/actions/workflows/ci.yml/badge.svg)](https://github.com/ajaysingh56656/expo-gradle-properties/actions/workflows/ci.yml)
+[![CI](https://github.com/dangerdeveloper/expo-gradle-properties/actions/workflows/ci.yml/badge.svg)](https://github.com/dangerdeveloper/expo-gradle-properties/actions/workflows/ci.yml)
 [![license](https://img.shields.io/npm/l/expo-gradle-properties.svg)](./LICENSE)
 
 An [Expo config plugin](https://docs.expo.dev/config-plugins/introduction/) that writes arbitrary keys into the generated `android/gradle.properties`.
@@ -195,4 +195,4 @@ By taking part you agree to the [Code of Conduct](./CODE_OF_CONDUCT.md).
 
 ## License
 
-MIT © [dangerdeveloper](https://github.com/ajaysingh56656)
+MIT © [dangerdeveloper](https://github.com/dangerdeveloper)

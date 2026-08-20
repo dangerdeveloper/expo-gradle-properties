@@ -31,14 +31,14 @@
 	],
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/ajaysingh56656/expo-gradle-properties.git"
+		"url": "git+https://github.com/dangerdeveloper/expo-gradle-properties.git"
 	},
 	"bugs": {
-		"url": "https://github.com/ajaysingh56656/expo-gradle-properties/issues"
+		"url": "https://github.com/dangerdeveloper/expo-gradle-properties/issues"
 	},
-	"homepage": "https://github.com/ajaysingh56656/expo-gradle-properties#readme",
+	"homepage": "https://github.com/dangerdeveloper/expo-gradle-properties#readme",
 	"license": "MIT",
-	"author": "dangerdeveloper (https://github.com/ajaysingh56656)",
+	"author": "dangerdeveloper (https://github.com/dangerdeveloper)",
 	"engines": {
 		"node": ">=18"
 	},
