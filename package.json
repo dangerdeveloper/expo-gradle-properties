@@ -1,0 +1,54 @@
+{
+	"name": "expo-gradle-properties",
+	"version": "0.1.0",
+	"description": "Expo config plugin to set arbitrary keys in android/gradle.properties — the generic escape hatch expo-build-properties doesn't have.",
+	"main": "build/index.js",
+	"types": "build/index.d.ts",
+	"files": [
+		"build",
+		"app.plugin.js",
+		"README.md",
+		"LICENSE"
+	],
+	"scripts": {
+		"build": "tsc -p tsconfig.build.json",
+		"clean": "rm -rf build",
+		"typecheck": "tsc --noEmit",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"prepublishOnly": "npm run clean && npm run build && npm test"
+	},
+	"keywords": [
+		"expo",
+		"expo-config-plugin",
+		"config-plugin",
+		"react-native",
+		"gradle",
+		"gradle.properties",
+		"android",
+		"prebuild",
+		"jvmargs"
+	],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/ajaysingh56656/expo-gradle-properties.git"
+	},
+	"bugs": {
+		"url": "https://github.com/ajaysingh56656/expo-gradle-properties/issues"
+	},
+	"homepage": "https://github.com/ajaysingh56656/expo-gradle-properties#readme",
+	"license": "MIT",
+	"author": "dangerdeveloper (https://github.com/ajaysingh56656)",
+	"engines": {
+		"node": ">=18"
+	},
+	"peerDependencies": {
+		"expo": ">=50"
+	},
+	"devDependencies": {
+		"@types/node": "^22.10.2",
+		"expo": "^57.0.15",
+		"typescript": "^5.7.2",
+		"vitest": "^2.1.8"
+	}
+}

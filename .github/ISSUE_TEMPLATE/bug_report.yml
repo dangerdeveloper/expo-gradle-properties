@@ -1,0 +1,74 @@
+name: Bug report
+description: The plugin wrote the wrong thing, or failed when it shouldn't have.
+labels: ['bug']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. The three things that make a bug fixable here are your
+        plugin config, the file it produced, and what you expected instead.
+
+  - type: textarea
+    id: plugin-config
+    attributes:
+      label: Your plugin config
+      description: The `expo-gradle-properties` entry from your app.config.ts / app.json.
+      render: ts
+      placeholder: |
+        ['expo-gradle-properties', {
+          'org.gradle.jvmargs': '-Xmx4g',
+        }]
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: What ended up in android/gradle.properties
+      description: The relevant lines after running `expo prebuild`. Paste the surrounding lines too — position matters.
+      render: properties
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected instead
+    validations:
+      required: true
+
+  - type: input
+    id: plugin-version
+    attributes:
+      label: expo-gradle-properties version
+      placeholder: 0.1.0
+    validations:
+      required: true
+
+  - type: input
+    id: expo-version
+    attributes:
+      label: Expo SDK version
+      placeholder: '57.0.15'
+    validations:
+      required: true
+
+  - type: dropdown
+    id: workflow
+    attributes:
+      label: How do you build?
+      options:
+        - EAS Build
+        - Local prebuild + Gradle
+        - Both
+        - Something else
+    validations:
+      required: true
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything else
+      description: |
+        Useful if relevant: other config plugins you use, and whether you have a
+        `~/.gradle/gradle.properties` of your own.

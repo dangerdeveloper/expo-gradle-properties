@@ -1,0 +1,36 @@
+name: Feature request
+description: Suggest something this plugin should do.
+labels: ['enhancement']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Worth knowing before you write: this plugin writes `android/gradle.properties`
+        and nothing else. Changes to `build.gradle`, Proguard, Maven repos or anything
+        iOS belong in `expo-build-properties`.
+
+        Requests that widen the scope will probably be declined — a small tool that
+        does one thing predictably is the point.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you hitting?
+      description: Describe the situation, not the solution. What are you unable to do today?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would you like it to do?
+      description: A config snippet showing the API you'd want is ideal.
+      render: ts
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What have you tried?
+      description: Including whether `expo-build-properties` can already do this.

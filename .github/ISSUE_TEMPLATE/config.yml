@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Expo config plugins documentation
+    url: https://docs.expo.dev/config-plugins/introduction/
+    about: General questions about how config plugins work.
+  - name: expo-build-properties
+    url: https://docs.expo.dev/versions/latest/sdk/build-properties/
+    about: For build.gradle, Proguard, Maven repos, SDK versions and anything iOS.

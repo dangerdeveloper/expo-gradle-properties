@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install --frozen-lockfile
+
+      - name: Typecheck
+        run: bun run typecheck
+
+      - name: Test
+        run: bun run test
+
+      - name: Build
+        run: bun run build
+
+      # The published package is what consumers actually load, so prove the built
+      # entry point resolves and behaves before it can ever be released.
+      - name: Verify the packaged plugin entry
+        run: |
+          node -e "
+            const plugin = require('./app.plugin.js').default ?? require('./app.plugin.js');
+            const config = plugin({ name: 't', slug: 't' }, { 'org.gradle.jvmargs': '-Xmx4g' });
+            if (typeof config.mods.android.gradleProperties !== 'function') throw new Error('mod not registered');
+            try {
+              plugin({ name: 't', slug: 't' }, { 'bad key': '1' });
+              throw new Error('expected validation to throw');
+            } catch (error) {
+              if (!/Invalid Gradle property key/.test(error.message)) throw error;
+            }
+            console.log('packaged plugin entry OK');
+          "
